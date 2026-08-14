@@ -1,0 +1,14 @@
+[package]
+name = "fundaziun-davaz"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0"
+
+[[bin]]
+name = "stiftungen"
+path = "src/stiftungen.rs"
+
+[dependencies]
+anyhow = "1"
+genpdf = "0.2"
+lopdf = "0.34"

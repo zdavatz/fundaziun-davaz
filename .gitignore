@@ -1,0 +1,31 @@
+# OAuth / API credentials — never commit (this repo is public)
+client_secret_*.json
+token.json
+token_drive.json
+token_*.json
+
+# Private/vertrauliche Dokumente — gehören nicht in ein öffentliches Repo
+attachments/
+drive_docs/
+Stiftungsurkunde_*.docx
+Finanzuebersicht_*.md
+
+# Skripte, die den Urkundentext im Klartext enthalten: Liegenschaftsadressen,
+# Mailadressen der Familie und der Aufsichtsbehörde, Lohn- und
+# Hypothekenangaben. Die Werkzeuge bleiben lokal, nicht weil der Code geheim
+# wäre, sondern weil die eingebetteten Daten es sind.
+make_v*.py
+send_mail*.py
+edit_konzept.py
+
+# Generierte Recherche-PDFs — aus src/stiftungen.rs jederzeit reproduzierbar
+*_Recherche.pdf
+
+__pycache__/
+.venv/
+target/
+
+# Folgerungen mit den konkreten Angaben der Stiftung (Anfangskapital,
+# Lohn, Familienregelung). build.rs legt aus src/befunde.beispiel.rs eine
+# neutrale Fassung an, wenn diese Datei fehlt.
+src/befunde.rs
