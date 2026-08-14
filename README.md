@@ -10,9 +10,11 @@ Davatz und der Arbeit von Dr. med. Ursula Davatz zu ADHS und
 Neurodiversität.
 
 > Dieses Repository enthält **Werkzeuge**, keine Dokumente. Die
-> Stiftungsurkunde, das Konzept und die Finanzübersicht sind vertraulich
-> und liegen ausserhalb des Repositories – das Konzept als Google Doc,
-> die Urkunde als `.docx`. Beides ist in `.gitignore` ausgeschlossen.
+> Stiftungsurkunde, das Konzept, die Finanzübersicht und die Folgerungen
+> aus der Recherche sind vertraulich und liegen im zugriffsgeschützten
+> Google Doc beziehungsweise als `.docx` daneben – nicht in einer Datei,
+> die bloss von `.gitignore` verdeckt würde. Was hier eingecheckt ist,
+> darf öffentlich sein.
 
 ## Rust: Recherchebericht als PDF
 
@@ -31,6 +33,14 @@ cargo run --release --bin stiftungen -- --out /pfad/zum.pdf
 Ohne Argument enthält das PDF beide Stränge. Die Schriften liegen in
 `fonts/` (DejaVu Sans); ein anderes Verzeichnis lässt sich über `$FONT_DIR`
 setzen.
+
+Die Porträts, das Kapitel zu Handelsregister und Stiftungsaufsicht sowie
+alle Quellen sind öffentlich recherchiert und liegen im Repository. Die
+Folgerungen für unsere Urkunde nennen Anfangskapital, Lohn und die
+Familienregelung – sie stehen deshalb im Konzept-Google-Doc. Eingecheckt
+ist mit `src/befunde.beispiel.rs` eine neutrale Fassung, die `build.rs`
+auslegt, wenn keine lokale vorhanden ist: ein frischer Klon baut also und
+liefert einen vollständigen Bericht, nur ohne unsere Zahlen.
 
 Gesetzt wird direkt mit [`genpdf`](https://crates.io/crates/genpdf) – kein
 Browser, kein HTML-Zwischenschritt, dieselbe Pipeline wie in

@@ -17,6 +17,7 @@ Finanzuebersicht_*.md
 make_v*.py
 send_mail*.py
 edit_konzept.py
+konzept_befunde.py
 
 # Generierte Recherche-PDFs — aus src/stiftungen.rs jederzeit reproduzierbar
 *_Recherche.pdf
@@ -25,7 +26,6 @@ __pycache__/
 .venv/
 target/
 
-# Folgerungen mit den konkreten Angaben der Stiftung (Anfangskapital,
-# Lohn, Familienregelung). build.rs legt aus src/befunde.beispiel.rs eine
-# neutrale Fassung an, wenn diese Datei fehlt.
+# Bauartefakt: build.rs legt es aus src/befunde.beispiel.rs an. Die Fassung
+# mit den konkreten Angaben der Stiftung steht im Konzept-Google-Doc.
 src/befunde.rs

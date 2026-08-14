@@ -66,6 +66,15 @@ Die `--k`/`--g`-Auswahl steuert über `enum Auswahl` Deckblatt, Kapitelfolge,
 Nummerierung und Vorgabedateiname. Ohne Argument enthält das PDF beide
 Stränge.
 
+Die Folgerungen liegen in `src/befunde.rs`, das per `include!` eingezogen
+wird. Diese Datei ist ein **Bauartefakt**: `build.rs` legt sie aus
+`src/befunde.beispiel.rs` an, wenn sie fehlt. Die Fassung mit den konkreten
+Angaben – Anfangskapital, Lohn, Familienregelung – steht im Konzept-Google-Doc
+unter «11. Recherche: Was vergleichbare Stiftungen für unsere Urkunde
+bedeuten», nicht hier. Wer den Bericht mit den echten Zahlen setzen will,
+holt sie von dort und legt sie lokal ab; eingecheckt wird nur die neutrale
+Fassung.
+
 ### Urkunden-Skripte (`make_v1*.py`) – lokal, nicht im Repository
 
 Diese Skripte, ebenso `send_mail*.py` und `edit_konzept.py`, sind in
@@ -102,10 +111,18 @@ Hängt der OAuth-Flow scheinbar, liegt es an gepuffertem stdout – mit
 - `client_secret_*.json`, `token*.json`
 - `Stiftungsurkunde_*.docx`, `Finanzuebersicht_*.md`
 - `attachments/`, `drive_docs/`
-- `make_v*.py`, `send_mail*.py`, `edit_konzept.py` – sie tragen den
-  Urkundentext im Klartext: Liegenschaftsadressen, Mailadressen der
-  Familie und der Aufsichtsbehörde, Lohn- und Hypothekenangaben
+- `make_v*.py`, `send_mail*.py`, `edit_konzept.py`, `konzept_befunde.py` –
+  sie tragen den Urkundentext im Klartext: Liegenschaftsadressen,
+  Mailadressen der Familie und der Aufsichtsbehörde, Lohn- und
+  Hypothekenangaben
 - die erzeugten `*_Recherche.pdf` (jederzeit reproduzierbar)
+- `src/befunde.rs` – Bauartefakt, das `build.rs` anlegt
+
+**Der Grundsatz:** vertrauliche Inhalte gehören ins zugriffsgeschützte
+Google Doc, nicht in eine Datei, die bloss von `.gitignore` verdeckt wird.
+Ein `.gitignore`-Eintrag ist eine Vorsichtsmassnahme, kein Schutz – ein
+`git add -f` genügt. Wo ein Inhalt geheim bleiben soll, ist der richtige
+Ort das Doc; das Repository bekommt allenfalls eine neutrale Fassung.
 
 Das Stiftungskonzept bleibt bewusst als Google Doc und kommt nicht ins
 Repository. Vor jedem Commit `git status` prüfen; niemals Adressen,
