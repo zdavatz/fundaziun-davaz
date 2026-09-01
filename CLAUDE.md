@@ -136,6 +136,20 @@ eingecheckte Dateien schreiben.
   gesamtschweizerischer oder internationaler Tätigkeit ginge die Aufsicht
   an die Eidgenössische Stiftungsaufsicht (ESA) in Bern über. Art. 2 der
   Urkunde öffnet das Tätigkeitsgebiet – dieser Punkt ist offen.
+  Massgebend ist, **wo der Zweck erfüllt wird, nicht wen er erreicht**:
+  die Fondation Beyeler bleibt trotz Weltrang bei der kantonalen BVG- und
+  Stiftungsaufsicht beider Basel, weil ihr Zweck an das Museum in Riehen
+  gebunden ist.
+- Wo Stifter, Eigentümer der Liegenschaft, Stiftungsrat und Urheber
+  **dieselbe Person** sind, prüft die Aufsicht zuerst Interessenkonflikt,
+  Selbstkontrahierung und Ausstand. Die Urkunde braucht dann dreierlei:
+  eine Ausstandsregelung für Geschäfte zwischen Stiftung und Stifter,
+  eine nicht der Familie angehörende Mehrheit im Stiftungsrat – sonst
+  wirkt der Ausstand nicht –, und eine ausdrückliche Regel, ob und
+  wieviel die Stiftung für die Nutzung der Liegenschaft bezahlt. Ein zu
+  hoher Zins wäre eine verdeckte Zuwendung an den Stifter, ein zu tiefer
+  eine Dauersubvention, auf die sich die Stiftung nicht verlassen kann.
+  Vergleichsfall im Bericht: Fundaziun Chastè da Tarasp (Portrait 9).
 - Urheberpersönlichkeitsrechte sind nach URG nicht übertragbar. Gewidmet
   werden können nur die **übertragbaren** Urheberrechte; eine Widmung
   «sämtlicher Urheberrechte» wäre insoweit unwirksam.

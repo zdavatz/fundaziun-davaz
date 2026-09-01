@@ -280,6 +280,55 @@ const PORTRAITS: &[Portrait] = &[
         angemeldet: "Sitz und Handelsregister Aargau; die städtischen Beiträge \
                      gingen durch eine Volksabstimmung in Baden.",
     },
+    Portrait {
+        name: "Fundaziun Chastè da Tarasp",
+        ort: "Tarasp GR",
+        url: "https://www.schloss-tarasp.ch/",
+        kurz: "Der einzige Bündner Fall und die umgekehrte Bauart: die \
+               Liegenschaft bleibt in privater Hand, die Stiftung betreibt - \
+               und beide Rollen hält dieselbe Person.",
+        gegruendet: "Am 1. November 2010 von der Gemeinde Tarasp errichtet, \
+                     zunächst mit dem Ziel, das Schloss selbst zu erwerben. \
+                     Dieser Erwerb scheiterte. Am 30. März 2016 kaufte der \
+                     Künstler Not Vital das Schloss für CHF 7.9 Mio.; Prinz \
+                     Philipp von Hessen übergab ihm den Schlüssel.",
+        traegerschaft: "Eigentümer ist Not Vital persönlich, nicht die \
+                        Stiftung. Die Fundaziun führt den Kulturbetrieb in \
+                        einem Haus, das ihm gehört, und zeigt darin unter \
+                        anderem sein eigenes Werk. Eine spätere Überführung \
+                        des Schlosses in eine Stiftung ist angekündigt; ob sie \
+                        erfolgt ist, liess sich aus öffentlichen Quellen nicht \
+                        feststellen.",
+        fuehrung: "Personalunion in drei Rollen: Not Vital ist Eigentümer \
+                   des Schlosses, Präsident des Stiftungsrats und der \
+                   ausgestellte Künstler zugleich. Dem Rat gehören ferner \
+                   Andri Riatsch als Vizepräsident sowie Giorgio Cappellin und \
+                   Annatina Miescher an; Revisionsstelle ist die RBT AG. Das \
+                   Schloss ist nur mit Führung zugänglich, die Anmeldung läuft \
+                   über notvital.com. Genau diese Häufung - Stiftung erhält \
+                   und bespielt eine Liegenschaft, deren Eigentümer sie \
+                   präsidiert und dessen Werk sie zeigt - ist der Punkt, den \
+                   eine Aufsichtsbehörde zuerst prüft: Interessenkonflikt, \
+                   Selbstkontrahierung, Ausstand. Für uns folgt daraus \
+                   dreierlei: eine Ausstandsregelung für Geschäfte zwischen \
+                   Stiftung und Stifter, eine nicht der Familie angehörende \
+                   Mehrheit im Stiftungsrat, damit der Ausstand überhaupt \
+                   wirkt, und eine ausdrückliche Regel, ob und wieviel die \
+                   Stiftung für die Nutzung der Liegenschaft bezahlt.",
+        finanzierung: "Eintritte aus den Führungen - Erwachsene CHF 10, Kinder \
+                       CHF 5 - tragen den Betrieb nicht allein. Der Erwerb \
+                       wurde privat finanziert; die Stiftung war dazu nicht in \
+                       der Lage, was ihren gescheiterten Kaufversuch erklärt. \
+                       Der Geldfluss geht damit vom Stifter zur Stiftung, \
+                       nicht umgekehrt: eine Entschädigung an ihn ist in \
+                       keiner öffentlichen Quelle erwähnt. Belegen lässt sich \
+                       das nicht, denn die Jahresrechnung ist nicht \
+                       öffentlich.",
+        angemeldet: "Sitz Tarasp, Handelsregister Graubünden. \
+                     Aufsichtsbehörde ist die Stiftungsaufsicht des Kantons \
+                     Graubünden, weil der Zweck ortsgebunden ist und im \
+                     Sitzkanton erfüllt wird - dieselbe Lage wie bei uns.",
+    },
 ];
 
 /// Zweiter Strang: Stiftungen, die sich mit psychischer Gesundheit befassen,
@@ -553,6 +602,12 @@ const QUELLEN_KUNST: &[(&str, &str)] = &[
     ("Zofinger Tagblatt, Zukunft des Museums nach Verkauf der Cézanne-Bilder \
       gesichert",
      "https://zofingertagblatt.ch/baden-langmatt-versteigerung-zukunft-des-museums-nach-verkauf-der-cezanne-bilder-gesichert/"),
+    ("Schloss Tarasp / Chastè da Tarasp", "https://www.schloss-tarasp.ch/"),
+    ("StiftungSchweiz, Fundaziun CHASTÈ DA TARASP - Not Vital",
+     "https://stiftungen.stiftungschweiz.ch/organisation/fundaziun-chaste-da-tarasp-not-vital"),
+    ("SRF, Not Vital: Neuer Herr von Schloss Tarasp",
+     "https://www.srf.ch/news/graubuenden-not-vital-neuer-herr-von-schloss-tarasp"),
+    ("Wikipedia, Schloss Tarasp", "https://de.wikipedia.org/wiki/Schloss_Tarasp"),
 ];
 
 const QUELLEN_GESUNDHEIT: &[(&str, &str)] = &[

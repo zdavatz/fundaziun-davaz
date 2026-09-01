@@ -20,13 +20,14 @@ Neurodiversität.
 
 `src/stiftungen.rs` erzeugt den Bericht *Stiftungen in der Schweiz* – wie
 vergleichbare Stiftungen betrieben, geführt, finanziert und beaufsichtigt
-werden, und was daraus für unsere Urkunde folgt. Sechzehn Porträts, zwölf
-Folgerungen, alle Quellen als anklickbare Links.
+werden, und was daraus für unsere Urkunde folgt. Siebzehn Porträts – neun
+Kunststiftungen, acht zu psychischer Gesundheit –, dazu die Folgerungen und
+alle Quellen als anklickbare Links.
 
 ```sh
-cargo run --release --bin stiftungen              # beide Stränge (25 Seiten)
-cargo run --release --bin stiftungen -- --k       # nur Kunststiftungen
-cargo run --release --bin stiftungen -- --g       # nur psychische Gesundheit
+cargo run --release --bin stiftungen              # beide Stränge (28 Seiten)
+cargo run --release --bin stiftungen -- --k       # nur Kunst (16 Seiten)
+cargo run --release --bin stiftungen -- --g       # nur Gesundheit (14 Seiten)
 cargo run --release --bin stiftungen -- --out /pfad/zum.pdf
 ```
 
