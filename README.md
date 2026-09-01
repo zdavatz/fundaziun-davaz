@@ -51,16 +51,25 @@ Zuordnung ist durch einen Abgleich der Anzahl abgesichert.
 
 ## Python: Google-Workspace-Werkzeuge
 
-Alle Skripte sprechen die Google-APIs des GCP-Projekts `fundaziun-davaz`
-über OAuth an. Die Scopes sind bewusst getrennt, jeder mit eigenem Token,
-damit ein Lesezugriff nie zum Versandrecht wird:
+Alle Skripte sprechen die Google-APIs über OAuth an. Zugangsdaten liegen
+ausserhalb des Repositorys unter `~/.config/fundaziun-davaz/`, mit zwei
+Trennungen: je Scope ein eigenes Token, damit ein Lesezugriff nie zum
+Versandrecht wird – und je Konto ein eigenes Verzeichnis, damit kein Skript
+aus dem falschen Postfach sendet.
 
-| Datei | Scope | Zweck |
-| --- | --- | --- |
-| `token.json` | `gmail.readonly` | Mails und Anhänge lesen |
-| `token_drive.json` | `drive.readonly` | Drive durchsuchen und herunterladen |
-| `token_docs.json` | `documents` | Google Docs bearbeiten |
-| `token_send.json` | `gmail.send` | Mails versenden |
+```
+~/.config/fundaziun-davaz/
+├── client_secret_<projekt>.json
+└── <konto>/
+    ├── gmail.readonly.json      Mails und Anhänge lesen
+    ├── gmail.send.json          Mails versenden
+    ├── gmail.compose.json       Entwürfe anlegen
+    ├── documents.json           Google Docs bearbeiten
+    └── drive.file.json          eigene Drive-Dateien
+```
+
+Der Pfad nennt das Konto, nicht der Dateiname. Ein Token, das nur
+`token_gmail_send.json` heisst, sagt nicht, aus welchem Postfach es sendet.
 
 - `fetch_attachments.py` – lädt `.docx`-Anhänge aus Gmail-Threads,
   entdoppelt über SHA-256 (dasselbe Dokument taucht in Original und

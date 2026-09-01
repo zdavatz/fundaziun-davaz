@@ -94,11 +94,33 @@ Offene Angaben stehen im Dokument gelb hinterlegt
 
 ### Google-APIs
 
-GCP-Projekt `fundaziun-davaz`, OAuth-Client `mail-cli` (Desktop).
-Getrennte Scopes mit je eigenem Token: `token.json` (gmail.readonly),
-`token_drive.json` (drive.readonly), `token_docs.json` (documents),
-`token_send.json` (gmail.send). Ein Lesezugriff soll nie zum Versandrecht
-werden.
+Zugangsdaten liegen **ausserhalb des Repositorys**, unter
+`~/.config/fundaziun-davaz/` (Verzeichnis 0700, alle Dateien 0600):
+
+```
+~/.config/fundaziun-davaz/
+├── client_secret_<projekt>.json      OAuth-Client, Typ Desktop
+└── <konto>/                          je Konto ein Verzeichnis
+    ├── gmail.readonly.json
+    ├── gmail.send.json
+    ├── gmail.compose.json
+    ├── documents.json
+    └── drive.file.json
+```
+
+**Zwei Trennungen, beide gewollt.** Erstens je Scope ein eigenes Token –
+ein Lesezugriff soll nie zum Versandrecht werden. Zweitens je Konto ein
+eigenes Verzeichnis: ein Skript muss das Konto im Pfad nennen und kann
+so nicht versehentlich aus dem falschen Postfach senden. Dateinamen wie
+`token_gmail_send.json` ohne Konto im Namen sind die Falle, die es zu
+vermeiden gilt.
+
+Es gibt mehrere GCP-Projekte, und ihr **Nutzertyp entscheidet, wer sich
+anmelden darf**: Ein Consent-Screen auf «Intern» lässt nur Konten der
+eigenen Organisation zu – ein gmail.com-Konto scheitert dort mit
+`403 org_internal`, unabhängig von der Testnutzerliste. Für externe
+Konten braucht es Nutzertyp «Extern» und einen Eintrag unter
+Zielgruppe → Testnutzer, sonst `403 access_denied`.
 
 Hängt der OAuth-Flow scheinbar, liegt es an gepuffertem stdout – mit
 `python -u` starten, damit die Consent-URL erscheint.
@@ -108,7 +130,8 @@ Hängt der OAuth-Flow scheinbar, liegt es an gepuffertem stdout – mit
 **Dieses Repository ist öffentlich.** Ausserhalb bleiben und in
 `.gitignore` geführt:
 
-- `client_secret_*.json`, `token*.json`
+- `client_secret_*.json`, `token*.json` – sie gehören ohnehin nach
+  `~/.config/fundaziun-davaz/`, nicht ins Arbeitsverzeichnis
 - `Stiftungsurkunde_*.docx`, `Finanzuebersicht_*.md`
 - `attachments/`, `drive_docs/`
 - `make_v*.py`, `send_mail*.py`, `edit_konzept.py`, `konzept_befunde.py` –
