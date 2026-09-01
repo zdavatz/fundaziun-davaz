@@ -29,7 +29,7 @@ use genpdf::{Alignment, Element};
 const DEFAULT_FONT_DIR: &str = "fonts";
 const DEFAULT_OUT: &str = "Stiftungen_Schweiz_Recherche.pdf";
 
-const STAND: &str = "Stand: 14. August 2026";
+const STAND: &str = "Stand: 1. September 2026";
 
 // Zurückhaltende Palette: Tinte für den Fliesstext, Gold als einziger Akzent,
 // Schiefer für Zwischentitel, Grau für Beiwerk.
@@ -1155,7 +1155,8 @@ fn push_quellen(doc: &mut genpdf::Document, auswahl: Auswahl) {
     h1(doc, "ANHANG", "Quellen");
     body(
         doc,
-        "Recherche vom 14. August 2026. Betriebszahlen von Stiftungen sind nur \
+        "Recherche vom 14. August und 1. September 2026. Betriebszahlen von \
+         Stiftungen sind nur \
          so aktuell wie die letzte veröffentlichte Vorlage oder \
          Medienmitteilung; wo eine Zahl aus einer älteren Quelle stammt, ist \
          das im Text vermerkt.",
