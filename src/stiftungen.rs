@@ -298,7 +298,17 @@ const PORTRAITS: &[Portrait] = &[
                         anderem sein eigenes Werk. Eine spätere Überführung \
                         des Schlosses in eine Stiftung ist angekündigt; ob sie \
                         erfolgt ist, liess sich aus öffentlichen Quellen nicht \
-                        feststellen.",
+                        feststellen. Darin liegt die eigentliche Lehre des \
+                        Falls: Stirbt der Eigentümer, fällt das Schloss in \
+                        seinen Nachlass, und die Stiftung hat daran keinen \
+                        Anspruch, sofern nicht Baurecht, Nutzniessung oder \
+                        eine testamentarische Anordnung vorsorgen. Ihr Zweck - \
+                        Erwerb, Unterhalt, Erhaltung und Betrieb genau dieser \
+                        Anlage - würde unerreichbar, und eine Stiftung mit \
+                        unerreichbarem Zweck wird nach Art. 88 ZGB aufgehoben. \
+                        Wer eine Stiftung auf eine Liegenschaft ausrichtet, \
+                        die ihr nicht gehört, muss den Zugriff vertraglich \
+                        oder erbrechtlich sichern.",
         fuehrung: "Personalunion in drei Rollen: Not Vital ist Eigentümer \
                    des Schlosses, Präsident des Stiftungsrats und der \
                    ausgestellte Künstler zugleich. Dem Rat gehören ferner \
