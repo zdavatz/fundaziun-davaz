@@ -105,6 +105,9 @@ Vier Dinge, die dabei zugeschlagen haben:
    weiter. Die Resthöhe einer Seite lässt sich von aussen nicht abfragen.
    Umbrüche müssen deshalb von Hand gesetzt werden – zwei Bildblöcke je
    Seite, jede Hauptziffer auf einer eigenen Seite.
+   Für Zwischentitel, die sonst allein am Seitenfuss stünden, kennt
+   `stellungnahme.rs` den Marker `UMBRUCH` (`@` am Titelanfang); er wird
+   beim Satz entfernt und erzwingt an dieser Stelle eine neue Seite.
 
 3. **Was zusammengehört, muss in denselben Absatz.** Antragsnummer und
    Antragstext waren zwei Elemente; genpdf brach dazwischen um und liess

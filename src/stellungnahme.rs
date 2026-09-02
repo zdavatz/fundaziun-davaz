@@ -204,6 +204,18 @@ fn push_belege(
     Ok(())
 }
 
+/// Ein Unterpunkt, dessen Titel mit diesem Zeichen beginnt, wird auf einer
+/// neuen Seite begonnen.
+///
+/// Für die Hauptziffern erzwingt `push_begruendung` den Umbruch ohnehin. Bei
+/// den Zwischentiteln geht das nicht: sie sollen im Fluss stehen. Fällt einer
+/// von ihnen ans Seitenende, steht er dort allein und sein Text beginnt erst
+/// auf der nächsten Seite - genau der Satzfehler, den genpdf 0.2 nicht
+/// verhindern kann, weil es weder eine Schusterjungen-Regel kennt noch die
+/// Resthöhe einer Seite preisgibt. Dann wird der Umbruch hier von Hand
+/// gesetzt, indem der Titel im Inhalt mit diesem Zeichen beginnt.
+const UMBRUCH: char = '@';
+
 fn push_begruendung(doc: &mut genpdf::Document, foto_dir: &Path) -> Result<()> {
     push_lines(
         doc,
@@ -235,7 +247,11 @@ fn push_begruendung(doc: &mut genpdf::Document, foto_dir: &Path) -> Result<()> {
             body(doc, a.text);
         }
         for (j, (titel, text)) in a.unterpunkte.iter().enumerate() {
-            doc.push(Break::new(0.5));
+            match titel.strip_prefix(UMBRUCH) {
+                Some(_) => doc.push(PageBreak::new()),
+                None => doc.push(Break::new(0.5)),
+            }
+            let titel = titel.strip_prefix(UMBRUCH).unwrap_or(titel);
             push_lines(
                 doc,
                 &format!("{}.{} {}", i + 1, j + 1, titel),
