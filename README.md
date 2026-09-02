@@ -115,6 +115,14 @@ Aufnahme beruht; über eine Baubewilligungssache entscheidet der
 Gemeindevorstand, nicht das Bauamt, und ein Argument neben der Aufnahme
 wirkt anders als eine blosse Bildnummer.
 
+Die Seitenumbrüche setzt das Programm, nicht genpdf. Jede Hauptziffer
+beginnt auf einer eigenen Seite, Antragsnummer und Antragstext stehen im
+selben Absatz, Bild und Legende ebenfalls. Wo ein Zwischentitel trotzdem
+allein ans Seitenende fiele, beginnt sein Titel im Inhalt mit `@`; das
+Zeichen erzwingt eine neue Seite und wird beim Satz entfernt. Das kostet
+Weissraum – aber eine Rechtsschrift, auf deren Ziffern später verwiesen
+wird, verträgt keinen Titel ohne Text darunter.
+
 ## Python: Google-Workspace-Werkzeuge
 
 Alle Skripte sprechen die Google-APIs über OAuth an. Zugangsdaten liegen
