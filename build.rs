@@ -15,6 +15,18 @@ fn main() {
              src/befunde.beispiel.rs ausgelegt."
         );
     }
+    let ziel = Path::new("src/inventar_inhalt.rs");
+    if !ziel.exists() {
+        std::fs::copy("src/inventar_inhalt.beispiel.rs", ziel)
+            .expect("neutrale Fassung des Bildinventars konnte nicht ausgelegt werden");
+        println!(
+            "cargo:warning=src/inventar_inhalt.rs fehlte - neutrale Fassung aus \
+             src/inventar_inhalt.beispiel.rs ausgelegt."
+        );
+    }
+
     println!("cargo:rerun-if-changed=src/befunde.rs");
     println!("cargo:rerun-if-changed=src/befunde.beispiel.rs");
+    println!("cargo:rerun-if-changed=src/inventar_inhalt.rs");
+    println!("cargo:rerun-if-changed=src/inventar_inhalt.beispiel.rs");
 }

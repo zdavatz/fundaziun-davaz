@@ -29,3 +29,11 @@ target/
 # Bauartefakt: build.rs legt es aus src/befunde.beispiel.rs an. Die Fassung
 # mit den konkreten Angaben der Stiftung steht im Konzept-Google-Doc.
 src/befunde.rs
+
+# Bauartefakt: build.rs legt es aus src/inventar_inhalt.beispiel.rs an. Die
+# Fassung mit den konkreten Angaben nennt Liegenschaft, Adresse,
+# Verfahrensnummern und die Bauvorgänge am Gebäude.
+src/inventar_inhalt.rs
+
+# Generiertes Bildinventar - enthält die behördlichen Aufnahmen selbst
+Bildinventar*.pdf

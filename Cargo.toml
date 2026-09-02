@@ -8,7 +8,11 @@ license = "GPL-3.0"
 name = "stiftungen"
 path = "src/stiftungen.rs"
 
+[[bin]]
+name = "bildinventar"
+path = "src/bildinventar.rs"
+
 [dependencies]
 anyhow = "1"
-genpdf = "0.2"
+genpdf = { version = "0.2", features = ["images"] }
 lopdf = "0.34"
