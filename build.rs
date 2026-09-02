@@ -27,6 +27,18 @@ fn main() {
 
     println!("cargo:rerun-if-changed=src/befunde.rs");
     println!("cargo:rerun-if-changed=src/befunde.beispiel.rs");
+    let ziel = Path::new("src/stellungnahme_inhalt.rs");
+    if !ziel.exists() {
+        std::fs::copy("src/stellungnahme_inhalt.beispiel.rs", ziel)
+            .expect("neutrale Fassung der Stellungnahme konnte nicht ausgelegt werden");
+        println!(
+            "cargo:warning=src/stellungnahme_inhalt.rs fehlte - neutrale Fassung aus \
+             src/stellungnahme_inhalt.beispiel.rs ausgelegt."
+        );
+    }
+
     println!("cargo:rerun-if-changed=src/inventar_inhalt.rs");
+    println!("cargo:rerun-if-changed=src/stellungnahme_inhalt.rs");
+    println!("cargo:rerun-if-changed=src/stellungnahme_inhalt.beispiel.rs");
     println!("cargo:rerun-if-changed=src/inventar_inhalt.beispiel.rs");
 }

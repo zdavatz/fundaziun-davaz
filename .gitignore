@@ -35,5 +35,13 @@ src/befunde.rs
 # Verfahrensnummern und die Bauvorgänge am Gebäude.
 src/inventar_inhalt.rs
 
+# Bauartefakt: build.rs legt es aus src/stellungnahme_inhalt.beispiel.rs an.
+# Die Fassung mit dem wirklichen Text nennt Namen, Adressen, Liegenschaft und
+# Verfahren.
+src/stellungnahme_inhalt.rs
+
+# Generierte Rechtsschriften
+Stellungnahme*.pdf
+
 # Generiertes Bildinventar - enthält die behördlichen Aufnahmen selbst
 Bildinventar*.pdf
