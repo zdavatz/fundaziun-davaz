@@ -8,7 +8,9 @@ Werkzeuge für die Errichtung der **FUNDAZIUN DA VAZ – VAL MÜSTAIR**
 (Art. 80 ff. ZGB, Sitz Sta. Maria, Val Müstair, Kanton Graubünden). Zwei
 Sprachen, zwei Aufgaben:
 
-- **Rust** – `src/stiftungen.rs` erzeugt den Recherchebericht als PDF.
+- **Rust** – drei Satzprogramme: `src/stiftungen.rs` erzeugt den
+  Recherchebericht, `src/bildinventar.rs` beschriftet eine behördliche
+  Fotodokumentation, `src/stellungnahme.rs` setzt eine Rechtsschrift.
 - **Python** – Google-Workspace-Skripte für Gmail, Drive und Docs sowie
   die versionierte Bearbeitung der Stiftungsurkunde.
 
@@ -19,12 +21,16 @@ gemischt; der bestehende Stil in der jeweiligen Datei gibt den Ausschlag.
 ## Build und Ausführung
 
 ```sh
-cargo build --release --bin stiftungen
 cargo run --release --bin stiftungen              # beide Stränge
 cargo run --release --bin stiftungen -- --k       # nur Kunst
 cargo run --release --bin stiftungen -- --g       # nur Gesundheit
-cargo run --release --bin stiftungen -- --out /pfad/zum.pdf
+cargo run --release --bin bildinventar            # Fotodokumentation beschriften
+cargo run --release --bin stellungnahme           # Rechtsschrift
+# alle drei: -- --out /pfad/zum.pdf
 ```
+
+`$FONT_DIR` setzt das Schriftverzeichnis (Vorgabe `fonts`), `$FOTO_DIR` das
+Bildverzeichnis der beiden Bilddokumente (Vorgabe `attachments/bauamt`).
 
 Es gibt keine Tests und kein CI. Prüfen heisst hier: PDF erzeugen, mit
 `pdftotext` den Text und mit `pdftoppm -png` einzelne Seiten ansehen.
@@ -74,6 +80,46 @@ unter «11. Recherche: Was vergleichbare Stiftungen für unsere Urkunde
 bedeuten», nicht hier. Wer den Bericht mit den echten Zahlen setzen will,
 holt sie von dort und legt sie lokal ab; eingecheckt wird nur die neutrale
 Fassung.
+
+### Bilddokumente (`src/bildinventar.rs`, `src/stellungnahme.rs`)
+
+Beide folgen demselben Muster wie `stiftungen.rs`: Satz eingecheckt, Inhalt
+daneben und ausgeschlossen (`src/inventar_inhalt.rs`,
+`src/stellungnahme_inhalt.rs`), neutrale Beispielfassung von `build.rs`
+ausgelegt.
+
+Vier Dinge, die dabei zugeschlagen haben:
+
+1. **genpdf bettet Bilder als entpackte RGB-Pixel ein.** Neunundzwanzig
+   Aufnahmen ergaben 47 MB. `jpegs_einsetzen` tauscht die Bildströme nach
+   dem Satz mit `lopdf` gegen die Original-JPEGs (baseline, drei Kanäle,
+   `DCTDecode`) – rund 6 MB, und die Aufnahmen bleiben bitgleich die der
+   Behörde, was bei einer Beilage im Bauverfahren der eigentliche Punkt
+   ist. Die Zuordnung läuft über die Objektreihenfolge und **bricht bei
+   abweichender Anzahl ab**, wie `add_links`. Wird die Bildauswahl
+   gefiltert, muss die Dateiliste derselben Auswahl folgen – sonst schlägt
+   genau diese Sicherung an.
+
+2. **genpdf 0.2 kennt kein «zusammenhalten».** Weder `LinearLayout` noch
+   `TableLayout`: beide melden `has_more` und laufen auf der nächsten Seite
+   weiter. Die Resthöhe einer Seite lässt sich von aussen nicht abfragen.
+   Umbrüche müssen deshalb von Hand gesetzt werden – zwei Bildblöcke je
+   Seite, jede Hauptziffer auf einer eigenen Seite.
+
+3. **Was zusammengehört, muss in denselben Absatz.** Antragsnummer und
+   Antragstext waren zwei Elemente; genpdf brach dazwischen um und liess
+   die blosse «3.» am Seitenfuss zurück. Dasselbe gilt für Bild und
+   Legende: fallen sie auseinander, steht die Legende auf der Folgeseite
+   über dem *nächsten* Bild, und wer überfliegt, ordnet sie falsch zu. In
+   einer Rechtsschrift der schlimmste Satzfehler, den es gibt.
+
+4. **`genpdf::fonts::from_files` erwartet die Endung `-Regular`.** Unsere
+   Datei heisst `DejaVuSans.ttf`; die vier Schnitte werden deshalb einzeln
+   geladen.
+
+Nach jeder Änderung am Satz das fertige PDF prüfen: je Seite die Zahl der
+Bilder gegen die Zahl der Legenden, und ob ein Titel oder eine
+Antragsnummer als letzte Zeile einer Seite steht.
 
 ### Urkunden-Skripte (`make_v1*.py`) – lokal, nicht im Repository
 
@@ -139,7 +185,11 @@ Hängt der OAuth-Flow scheinbar, liegt es an gepuffertem stdout – mit
   Mailadressen der Familie und der Aufsichtsbehörde, Lohn- und
   Hypothekenangaben
 - die erzeugten `*_Recherche.pdf` (jederzeit reproduzierbar)
-- `src/befunde.rs` – Bauartefakt, das `build.rs` anlegt
+- `src/befunde.rs`, `src/inventar_inhalt.rs`,
+  `src/stellungnahme_inhalt.rs` – Bauartefakte, die `build.rs` anlegt; die
+  echten Fassungen nennen Liegenschaft, Adresse, Verfahrensnummern, Namen
+  und die Bauvorgänge am Gebäude
+- die erzeugten `Bildinventar*.pdf` und `Stellungnahme*.pdf`
 
 **Der Grundsatz:** vertrauliche Inhalte gehören ins zugriffsgeschützte
 Google Doc, nicht in eine Datei, die bloss von `.gitignore` verdeckt wird.

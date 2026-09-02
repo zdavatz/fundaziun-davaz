@@ -10,11 +10,16 @@ Davatz und der Arbeit von Dr. med. Ursula Davatz zu ADHS und
 Neurodiversität.
 
 > Dieses Repository enthält **Werkzeuge**, keine Dokumente. Die
-> Stiftungsurkunde, das Konzept, die Finanzübersicht und die Folgerungen
-> aus der Recherche sind vertraulich und liegen im zugriffsgeschützten
-> Google Doc beziehungsweise als `.docx` daneben – nicht in einer Datei,
-> die bloss von `.gitignore` verdeckt würde. Was hier eingecheckt ist,
-> darf öffentlich sein.
+> Stiftungsurkunde, das Konzept, die Finanzübersicht, die Folgerungen aus
+> der Recherche und die Baurechtsakten sind vertraulich und liegen im
+> zugriffsgeschützten Google Doc beziehungsweise auf Drive – nicht in einer
+> Datei, die bloss von `.gitignore` verdeckt würde. Was hier eingecheckt
+> ist, darf öffentlich sein.
+>
+> Jedes der drei Satzprogramme trennt deshalb Satz und Inhalt: der Satz ist
+> eingecheckt, der Inhalt liegt in einer `*_inhalt.rs` beziehungsweise
+> `befunde.rs` daneben und ist ausgeschlossen. `build.rs` legt jeweils eine
+> neutrale Beispielfassung aus, damit ein frischer Klon baut.
 
 ## Rust: Recherchebericht als PDF
 
@@ -48,6 +53,67 @@ Browser, kein HTML-Zwischenschritt, dieselbe Pipeline wie in
 `~/software/listingtracker`. Da genpdf keine Hyperlinks kennt, werden die
 Link-Annotationen nachträglich mit `lopdf` über die URL-Zeilen gelegt; die
 Zuordnung ist durch einen Abgleich der Anzahl abgesichert.
+
+Zwei weitere Grenzen von genpdf 0.2, beide in den Bilddokumenten
+aufgetreten und im Code begründet. **Bilder legt es als entpackte
+RGB-Pixel ab** – neunundzwanzig Aufnahmen ergaben ein PDF von 47 MB. Die
+Vorlagen sind baseline-JPEG und damit unmittelbar als `DCTDecode`-Strom
+einsetzbar; sie werden nach dem Satz mit `lopdf` eingetauscht, was auf
+gut 6 MB führt und die Aufnahmen bitgleich denen der Behörde belässt. Die
+Zuordnung läuft über die Reihenfolge und bricht bei abweichender Anzahl ab,
+wie bei den Links. **Und es kennt kein «zusammenhalten»** – weder
+`LinearLayout` noch `TableLayout`, beide melden `has_more` und laufen auf
+der nächsten Seite weiter, und die Resthöhe einer Seite lässt sich von
+aussen nicht abfragen. Umbrüche zwischen Bild und Legende, zwischen Titel
+und Text und zwischen Antragsnummer und Antrag werden deshalb von Hand
+gesetzt beziehungsweise die Teile in denselben Absatz gezogen.
+
+## Rust: Behördenfotos beschriften
+
+`src/bildinventar.rs` entstand aus einer Verlegenheit. Führt eine Behörde
+einen Augenschein durch, fotografiert und weigert sich dann, die Aufnahmen
+zu nummerieren und zu sagen, was sie daran beanstandet, so lässt sich zu
+ihrem Vorhalt nicht Stellung nehmen – man kennt ihn nicht. Der Ausweg ist,
+die Dokumentation selbst zu nummerieren, jede Aufnahme sachlich zu
+beschreiben, sie den Punkten der behördlichen Verfügung zuzuordnen und die
+Angaben der Eigentümerschaft danebenzustellen.
+
+```sh
+cargo run --release --bin bildinventar
+cargo run --release --bin bildinventar -- --out /pfad/zum.pdf
+```
+
+Je Aufnahme das Bild selbst, darunter Nummer, Fundstelle in der
+behördlichen Vorlage, Beschreibung, «Beanstandet als …» und «Angaben der
+Eigentümerschaft …». Wo die Eigentümerschaft nichts zu erklären hat, wird
+die Lücke nicht stehen gelassen, sondern in eine Rückfrage verwandelt –
+bleibt sie unbeantwortet, ist aktenkundig, dass dort nichts beanstandet
+wird. Aufnahmen ohne zuordenbaren Vorwurf werden nicht abgebildet, aber
+genannt: eine Beilage, die Bilder der Gegenseite stillschweigend weglässt,
+wäre angreifbar, und zwar zu Recht.
+
+Bildverzeichnis über `$FOTO_DIR` (Vorgabe `attachments/bauamt`).
+
+## Rust: Rechtsschrift als PDF
+
+`src/stellungnahme.rs` setzt einen Brief an eine Behörde – Stellungnahme,
+Gesuch, Einsprache: Absender, Adressat, Ort und Datum, Betreff, Anträge
+vorn, dann die Begründung in nummerierten Ziffern, am Schluss
+Unterschriften und Beilagen.
+
+```sh
+cargo run --release --bin stellungnahme
+cargo run --release --bin stellungnahme -- --out /pfad/zum.pdf
+```
+
+Die Anträge stehen vor der Begründung, weil die Behörde auf der ersten
+Seite sehen soll, was verlangt wird, und erst danach, warum. Die Nummern
+der Ziffern vergibt der Satz – eine falsch nummerierte Rechtsschrift
+verweist ins Leere, und beim Einschieben eines Abschnitts geht das von Hand
+jedes Mal schief. Belegbilder stehen im Text, wo ein Argument auf einer
+Aufnahme beruht; über eine Baubewilligungssache entscheidet der
+Gemeindevorstand, nicht das Bauamt, und ein Argument neben der Aufnahme
+wirkt anders als eine blosse Bildnummer.
 
 ## Python: Google-Workspace-Werkzeuge
 
