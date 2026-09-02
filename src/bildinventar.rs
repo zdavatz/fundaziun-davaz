@@ -315,6 +315,21 @@ fn push_gruppen(doc: &mut genpdf::Document, foto_dir: &Path) -> Result<()> {
     for (i, g) in GRUPPEN.iter().enumerate() {
         doc.push(PageBreak::new());
         h1(doc, &format!("Teil III.{}", i + 1), g.titel);
+        // Nur Aufnahmen, die einem Punkt des Schreibens vom 25. Juni 2026
+        // zuzuordnen sind. Die übrigen zeigen nichts, wozu Stellung zu nehmen
+        // wäre; sie werden in Teil IV genannt, aber nicht abgebildet.
+        let gezeigt: Vec<&Bild> = g
+            .bilder
+            .iter()
+            .filter(|b| !b.beanstandet.is_empty())
+            .collect();
+        push_lines(
+            doc,
+            &format!("{} Aufnahmen.", gezeigt.len()),
+            Style::new().with_color(SLATE).with_font_size(10).bold(),
+            Alignment::Left,
+        );
+        doc.push(Break::new(0.3));
         body(doc, g.einleitung);
         doc.push(Break::new(1.0));
         // Ein Bildblock misst rund 117 mm, der Satzspiegel 253 mm: zwei Blöcke
@@ -323,7 +338,7 @@ fn push_gruppen(doc: &mut genpdf::Document, foto_dir: &Path) -> Result<()> {
         // Aufnahme und Legende wäre in einer Beilage der schlimmste Fehler -
         // die Behörde läse die Beschreibung zum falschen Bild. Deshalb wird
         // der Umbruch hier von Hand gesetzt statt dem Satz überlassen.
-        for (i, b) in g.bilder.iter().enumerate() {
+        for (i, b) in gezeigt.iter().enumerate() {
             if i % 2 == 1 {
                 doc.push(PageBreak::new());
             }
@@ -337,12 +352,18 @@ fn push_gruppen(doc: &mut genpdf::Document, foto_dir: &Path) -> Result<()> {
 /// hat, und stellt sie dem Bauamt als Frage. Die Liste wird aus den Bilddaten
 /// erzeugt und kann deshalb nicht von ihnen abweichen.
 fn push_rueckfragen(doc: &mut genpdf::Document) {
-    let offen: Vec<String> = GRUPPEN
+    // Nur abgebildete Aufnahmen: die übrigen stehen weiter unten unter "Nicht
+    // abgebildete Aufnahmen" und würden hier ein zweites Mal erscheinen. Und
+    // nach Nummer sortiert, nicht nach Gruppenreihenfolge - eine Liste, die
+    // "23, 26, 28, 5, 6" sagt, liest sich wie ein Versehen.
+    let mut nummern: Vec<u8> = GRUPPEN
         .iter()
         .flat_map(|g| g.bilder.iter())
-        .filter(|b| b.grundlage.is_empty())
-        .map(|b| b.nr.to_string())
+        .filter(|b| b.grundlage.is_empty() && !b.beanstandet.is_empty())
+        .map(|b| b.nr)
         .collect();
+    nummern.sort_unstable();
+    let offen: Vec<String> = nummern.iter().map(|n| n.to_string()).collect();
     if offen.is_empty() {
         return;
     }
@@ -351,7 +372,11 @@ fn push_rueckfragen(doc: &mut genpdf::Document) {
     body(
         doc,
         &format!(
-            "Zu den nachstehenden {} Aufnahmen hat die Eigentümerschaft nichts              zu erklären, weil sich ihr nicht erschliesst, was daran beanstandet              sein soll. Sie ersucht das Bauamt, zu jeder dieser Aufnahmen              mitzuteilen, ob es daran etwas beanstandet und, wenn ja, was.",
+            "Zu den nachstehenden {} Aufnahmen hat die Eigentümerschaft nichts \
+             zu erklären, weil sich ihr nicht erschliesst, was daran nach dem \
+             Schreiben vom 25. Juni 2026 beanstandet sein soll. Sie ersucht das \
+             Bauamt, zu jeder dieser Aufnahmen mitzuteilen, ob es daran etwas \
+             beanstandet und, wenn ja, was.",
             offen.len()
         ),
     );
@@ -365,8 +390,42 @@ fn push_rueckfragen(doc: &mut genpdf::Document) {
     doc.push(Break::new(0.6));
     body(
         doc,
-        "Bleibt diese Rückfrage unbeantwortet, ist davon auszugehen, dass an          diesen Aufnahmen nichts beanstandet wird und dass sie der beabsichtigten          Verfügung nicht zugrunde gelegt werden.",
+        "Bleibt diese Rückfrage unbeantwortet, ist davon auszugehen, dass an \
+         diesen Aufnahmen nichts beanstandet wird und dass sie der beabsichtigten \
+         Verfügung nicht zugrunde gelegt werden.",
     );
+
+    // Aufnahmen, denen sich kein Punkt des Schreibens vom 25. Juni 2026
+    // zuordnen lässt, werden nicht abgebildet - sie zeigten nichts, wozu
+    // Stellung zu nehmen wäre. Verschwiegen werden sie aber nicht: eine
+    // Beilage, die Bilder der Gegenseite stillschweigend weglässt, wäre
+    // angreifbar, und zwar zu Recht.
+    let ohne: Vec<&Bild> = GRUPPEN
+        .iter()
+        .flat_map(|g| g.bilder.iter())
+        .filter(|b| b.beanstandet.is_empty())
+        .collect();
+    if ohne.is_empty() {
+        return;
+    }
+    doc.push(Break::new(1.2));
+    h2(doc, "Nicht abgebildete Aufnahmen");
+    body(
+        doc,
+        "Die nachstehenden Aufnahmen sind in Teil III nicht wiedergegeben, weil \
+         sich an ihnen kein Bezug zu einem der im Schreiben vom 25. Juni 2026 \
+         beanstandeten Punkte erkennen lässt. Sie sind der Vollständigkeit halber \
+         genannt. Sieht das Bauamt dies anders, wird es ersucht, dies \
+         mitzuteilen.",
+    );
+    doc.push(Break::new(0.4));
+    for b in &ohne {
+        body(
+            doc,
+            &format!("Bild {} ({}): {}", b.nr, b.seite, b.beschreibung),
+        );
+        doc.push(Break::new(0.2));
+    }
 }
 
 fn push_feststellungen(doc: &mut genpdf::Document) {
@@ -530,7 +589,7 @@ fn main() -> Result<()> {
     // sich darauf.
     let mut dateien = Vec::new();
     for g in GRUPPEN {
-        for b in g.bilder {
+        for b in g.bilder.iter().filter(|b| !b.beanstandet.is_empty()) {
             let p = foto_dir.join(b.datei);
             if !p.exists() {
                 return Err(anyhow!(
