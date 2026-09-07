@@ -123,6 +123,33 @@ Zeichen erzwingt eine neue Seite und wird beim Satz entfernt. Das kostet
 Weissraum – aber eine Rechtsschrift, auf deren Ziffern später verwiesen
 wird, verträgt keinen Titel ohne Text darunter.
 
+## Rust: Bewilligungslage mit Belegen
+
+`src/bewilligung.rs` fasst zusammen, was in einem Bauverfahren bewilligt
+wurde und was nicht, wie die Entscheide zugestellt worden sind und welche
+Fristen daraus liefen. Vorn Übersichtstabellen je Verfahren, die massgebende
+Norm im Wortlaut, dann je Seite eine Ablichtung aus den Originalakten als
+Beleg – die Leserin soll die Zusammenfassung an der Quelle prüfen können,
+ohne die Akten daneben zu legen.
+
+```sh
+cargo run --release --bin bewilligung
+cargo run --release --bin bewilligung -- --out /pfad/zum.pdf
+```
+
+Die Belegseiten sind JPEG-Ablichtungen aus `$BELEG_DIR` (Vorgabe
+`attachments/bauamt/bewilligung_belege`), erzeugt mit `pdftoppm -jpeg`.
+Wie beim Bildinventar werden die Bildströme nach dem Satz gegen die
+Originaldateien getauscht, sonst wüchse das PDF auf Dutzende Megabyte.
+Jeder Beleg steht allein auf einer Seite, weil genpdf ein Bild nicht
+umbrechen kann; die Auflösung ist so gewählt, dass eine A4-Ablichtung samt
+Legende auf ein Blatt passt.
+
+Der Inhalt steht in `src/bewilligung_inhalt.rs` und ist ausgeschlossen –
+er nennt Liegenschaft, Verfahrensnummern, Namen und die Entscheide im
+Wortlaut. `build.rs` legt die neutrale Fassung aus
+`src/bewilligung_inhalt.beispiel.rs` aus.
+
 ## Python: Google-Workspace-Werkzeuge
 
 Alle Skripte sprechen die Google-APIs über OAuth an. Zugangsdaten liegen

@@ -8,9 +8,10 @@ Werkzeuge für die Errichtung der **FUNDAZIUN DA VAZ – VAL MÜSTAIR**
 (Art. 80 ff. ZGB, Sitz Sta. Maria, Val Müstair, Kanton Graubünden). Zwei
 Sprachen, zwei Aufgaben:
 
-- **Rust** – drei Satzprogramme: `src/stiftungen.rs` erzeugt den
+- **Rust** – vier Satzprogramme: `src/stiftungen.rs` erzeugt den
   Recherchebericht, `src/bildinventar.rs` beschriftet eine behördliche
-  Fotodokumentation, `src/stellungnahme.rs` setzt eine Rechtsschrift.
+  Fotodokumentation, `src/stellungnahme.rs` setzt eine Rechtsschrift,
+  `src/bewilligung.rs` stellt die Bewilligungslage mit Aktenbelegen dar.
 - **Python** – Google-Workspace-Skripte für Gmail, Drive und Docs sowie
   die versionierte Bearbeitung der Stiftungsurkunde.
 
@@ -26,11 +27,14 @@ cargo run --release --bin stiftungen -- --k       # nur Kunst
 cargo run --release --bin stiftungen -- --g       # nur Gesundheit
 cargo run --release --bin bildinventar            # Fotodokumentation beschriften
 cargo run --release --bin stellungnahme           # Rechtsschrift
-# alle drei: -- --out /pfad/zum.pdf
+cargo run --release --bin bewilligung             # Bewilligungslage mit Belegen
+# alle vier: -- --out /pfad/zum.pdf
 ```
 
 `$FONT_DIR` setzt das Schriftverzeichnis (Vorgabe `fonts`), `$FOTO_DIR` das
-Bildverzeichnis der beiden Bilddokumente (Vorgabe `attachments/bauamt`).
+Bildverzeichnis der beiden Bilddokumente (Vorgabe `attachments/bauamt`),
+`$BELEG_DIR` das Verzeichnis der Aktenablichtungen für die Bewilligungslage
+(Vorgabe `attachments/bauamt/bewilligung_belege`).
 
 Es gibt keine Tests und kein CI. Prüfen heisst hier: PDF erzeugen, mit
 `pdftotext` den Text und mit `pdftoppm -png` einzelne Seiten ansehen.
@@ -81,12 +85,14 @@ bedeuten», nicht hier. Wer den Bericht mit den echten Zahlen setzen will,
 holt sie von dort und legt sie lokal ab; eingecheckt wird nur die neutrale
 Fassung.
 
-### Bilddokumente (`src/bildinventar.rs`, `src/stellungnahme.rs`)
+### Bilddokumente (`src/bildinventar.rs`, `src/stellungnahme.rs`, `src/bewilligung.rs`)
 
-Beide folgen demselben Muster wie `stiftungen.rs`: Satz eingecheckt, Inhalt
-daneben und ausgeschlossen (`src/inventar_inhalt.rs`,
-`src/stellungnahme_inhalt.rs`), neutrale Beispielfassung von `build.rs`
-ausgelegt.
+Alle drei folgen demselben Muster wie `stiftungen.rs`: Satz eingecheckt,
+Inhalt daneben und ausgeschlossen (`src/inventar_inhalt.rs`,
+`src/stellungnahme_inhalt.rs`, `src/bewilligung_inhalt.rs`), neutrale
+Beispielfassung von `build.rs` ausgelegt. `bewilligung.rs` setzt zudem
+Tabellen mit `TableLayout`; genpdf nimmt Schriftgrössen nur als ganze
+Zahlen (`u8`), halbe Punkte gibt es nicht.
 
 Vier Dinge, die dabei zugeschlagen haben:
 
@@ -189,10 +195,12 @@ Hängt der OAuth-Flow scheinbar, liegt es an gepuffertem stdout – mit
   Hypothekenangaben
 - die erzeugten `*_Recherche.pdf` (jederzeit reproduzierbar)
 - `src/befunde.rs`, `src/inventar_inhalt.rs`,
-  `src/stellungnahme_inhalt.rs` – Bauartefakte, die `build.rs` anlegt; die
-  echten Fassungen nennen Liegenschaft, Adresse, Verfahrensnummern, Namen
-  und die Bauvorgänge am Gebäude
-- die erzeugten `Bildinventar*.pdf` und `Stellungnahme*.pdf`
+  `src/stellungnahme_inhalt.rs`, `src/bewilligung_inhalt.rs` –
+  Bauartefakte, die `build.rs` anlegt; die echten Fassungen nennen
+  Liegenschaft, Adresse, Verfahrensnummern, Namen und die Bauvorgänge am
+  Gebäude
+- die erzeugten `Bildinventar*.pdf`, `Stellungnahme*.pdf` und
+  `Bewilligungslage*.pdf`
 
 **Der Grundsatz:** vertrauliche Inhalte gehören ins zugriffsgeschützte
 Google Doc, nicht in eine Datei, die bloss von `.gitignore` verdeckt wird.

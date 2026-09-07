@@ -37,6 +37,18 @@ fn main() {
         );
     }
 
+    let ziel = Path::new("src/bewilligung_inhalt.rs");
+    if !ziel.exists() {
+        std::fs::copy("src/bewilligung_inhalt.beispiel.rs", ziel)
+            .expect("neutrale Fassung der Bewilligungslage konnte nicht ausgelegt werden");
+        println!(
+            "cargo:warning=src/bewilligung_inhalt.rs fehlte - neutrale Fassung aus \
+             src/bewilligung_inhalt.beispiel.rs ausgelegt."
+        );
+    }
+    println!("cargo:rerun-if-changed=src/bewilligung_inhalt.rs");
+    println!("cargo:rerun-if-changed=src/bewilligung_inhalt.beispiel.rs");
+
     println!("cargo:rerun-if-changed=src/inventar_inhalt.rs");
     println!("cargo:rerun-if-changed=src/stellungnahme_inhalt.rs");
     println!("cargo:rerun-if-changed=src/stellungnahme_inhalt.beispiel.rs");

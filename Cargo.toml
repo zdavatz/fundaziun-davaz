@@ -16,6 +16,10 @@ path = "src/bildinventar.rs"
 name = "stellungnahme"
 path = "src/stellungnahme.rs"
 
+[[bin]]
+name = "bewilligung"
+path = "src/bewilligung.rs"
+
 [dependencies]
 anyhow = "1"
 genpdf = { version = "0.2", features = ["images"] }

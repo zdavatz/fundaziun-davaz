@@ -40,6 +40,14 @@ src/inventar_inhalt.rs
 # Verfahren.
 src/stellungnahme_inhalt.rs
 
+# Bauartefakt: build.rs legt es aus src/bewilligung_inhalt.beispiel.rs an.
+# Die echte Fassung nennt Liegenschaft, Verfahrensnummern, Namen und die
+# Entscheide im Wortlaut.
+src/bewilligung_inhalt.rs
+
+# Generierte Übersicht der Bewilligungslage - enthält Ablichtungen der Akten
+Bewilligungslage*.pdf
+
 # Generierte Rechtsschriften
 Stellungnahme*.pdf
 
