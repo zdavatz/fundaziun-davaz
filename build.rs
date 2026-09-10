@@ -49,6 +49,12 @@ fn main() {
     println!("cargo:rerun-if-changed=src/bewilligung_inhalt.rs");
     println!("cargo:rerun-if-changed=src/bewilligung_inhalt.beispiel.rs");
 
+    // Zweite Rechtsschrift mit demselben Satz: INHALT=<datei in src/> wählt
+    // die Inhaltsdatei der Stellungnahme; jede *_inhalt.rs ist ausgeschlossen.
+    let inhalt = std::env::var("INHALT").unwrap_or_else(|_| "stellungnahme_inhalt.rs".to_string());
+    println!("cargo:rustc-env=STELLUNGNAHME_INHALT={inhalt}");
+    println!("cargo:rerun-if-env-changed=INHALT");
+    println!("cargo:rerun-if-changed=src/{inhalt}");
     println!("cargo:rerun-if-changed=src/inventar_inhalt.rs");
     println!("cargo:rerun-if-changed=src/stellungnahme_inhalt.rs");
     println!("cargo:rerun-if-changed=src/stellungnahme_inhalt.beispiel.rs");

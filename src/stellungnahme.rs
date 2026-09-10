@@ -71,7 +71,10 @@ struct Abschnitt {
     bilder: &'static [(&'static str, &'static str)],
 }
 
-include!("stellungnahme_inhalt.rs");
+// Welche Inhaltsdatei eingezogen wird, entscheidet build.rs: Vorgabe ist
+// stellungnahme_inhalt.rs; mit `INHALT=baustopp_inhalt.rs cargo run …` lässt
+// sich eine zweite Rechtsschrift mit demselben Satz erzeugen.
+include!(concat!(env!("CARGO_MANIFEST_DIR"), "/src/", env!("STELLUNGNAHME_INHALT")));
 
 // ---------------------------------------------------------------------------
 // Satz

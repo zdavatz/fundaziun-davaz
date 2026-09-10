@@ -39,6 +39,8 @@ src/inventar_inhalt.rs
 # Die Fassung mit dem wirklichen Text nennt Namen, Adressen, Liegenschaft und
 # Verfahren.
 src/stellungnahme_inhalt.rs
+# Weitere Rechtsschriften mit demselben Satz (INHALT=…): ebenfalls vertraulich.
+src/*_inhalt.rs
 
 # Bauartefakt: build.rs legt es aus src/bewilligung_inhalt.beispiel.rs an.
 # Die echte Fassung nennt Liegenschaft, Verfahrensnummern, Namen und die
