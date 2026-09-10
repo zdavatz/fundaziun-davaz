@@ -364,6 +364,30 @@ fn render(out: &Path, font_dir: &str, foto_dir: &Path) -> Result<()> {
 /// Vorlagen sind baseline-JPEG und lassen sich unmittelbar als
 /// `DCTDecode`-Strom einsetzen. Die Zuordnung läuft über die Reihenfolge und
 /// bricht bei abweichender Anzahl ab.
+/// Breite und Höhe eines Baseline- oder Progressive-JPEG aus dem SOF-Marker.
+fn jpeg_masse(roh: &[u8]) -> Option<(i64, i64)> {
+    let mut i = 2;
+    while i + 9 < roh.len() {
+        if roh[i] != 0xFF {
+            return None;
+        }
+        let marker = roh[i + 1];
+        let laenge = u16::from_be_bytes([roh[i + 2], roh[i + 3]]) as usize;
+        if matches!(marker, 0xC0..=0xC3 | 0xC5..=0xC7 | 0xC9..=0xCB | 0xCD..=0xCF) {
+            let h = u16::from_be_bytes([roh[i + 5], roh[i + 6]]) as i64;
+            let w = u16::from_be_bytes([roh[i + 7], roh[i + 8]]) as i64;
+            return Some((w, h));
+        }
+        i += 2 + laenge;
+    }
+    None
+}
+
+/// Tauscht die von genpdf als RGB-Pixel eingebetteten Bilder gegen die
+/// Original-JPEGs. Die Zuordnung läuft über Breite und Höhe: Objektnummern
+/// folgen nicht zwingend der Seitenfolge, die Masse aber sind je Bild
+/// eindeutig, solange nicht zwei Belege dieselben Masse haben - dann fällt
+/// die Zuordnung innerhalb dieser Gruppe auf die Reihenfolge zurück.
 fn jpegs_einsetzen(pdf: &Path, dateien: &[PathBuf]) -> Result<()> {
     use lopdf::{Document as LoDoc, Object};
 
@@ -371,40 +395,55 @@ fn jpegs_einsetzen(pdf: &Path, dateien: &[PathBuf]) -> Result<()> {
     let mut ids: Vec<_> = doc
         .objects
         .iter()
-        .filter(|(_, obj)| match obj {
-            Object::Stream(s) => s
-                .dict
-                .get(b"Subtype")
-                .ok()
-                .and_then(|o| o.as_name().ok())
-                .map(|n| n == b"Image")
-                .unwrap_or(false),
-            _ => false,
+        .filter_map(|(id, obj)| match obj {
+            Object::Stream(s) if s.dict.get(b"Subtype").ok()?.as_name().ok()? == b"Image" => {
+                let w = s.dict.get(b"Width").ok()?.as_i64().ok()?;
+                let h = s.dict.get(b"Height").ok()?.as_i64().ok()?;
+                Some((*id, (w, h)))
+            }
+            _ => None,
         })
-        .map(|(id, _)| *id)
         .collect();
     ids.sort_unstable();
 
     if ids.len() != dateien.len() {
         return Err(anyhow!(
-            "{} Bildobjekte im PDF, aber {} Belege - die Zuordnung über die \
-             Reihenfolge wäre nicht mehr verlässlich",
+            "{} Bildobjekte im PDF, aber {} Belege - die Zuordnung wäre nicht \
+             mehr verlässlich",
             ids.len(),
             dateien.len()
         ));
     }
-    for (id, datei) in ids.iter().zip(dateien) {
+    let mut frei: Vec<bool> = vec![true; ids.len()];
+    for datei in dateien {
         let roh = std::fs::read(datei)
             .with_context(|| format!("Beleg lesen: {}", datei.display()))?;
+        let masse = jpeg_masse(&roh)
+            .ok_or_else(|| anyhow!("kein JPEG-Grössenmarker in {}", datei.display()))?;
+        let pos = ids
+            .iter()
+            .enumerate()
+            .find(|(i, (_, m))| frei[*i] && *m == masse)
+            .map(|(i, _)| i)
+            .ok_or_else(|| {
+                anyhow!(
+                    "kein Bildobjekt mit {}×{} für {} - genpdf hat das Bild anders \
+                     eingebettet als erwartet",
+                    masse.0,
+                    masse.1,
+                    datei.display()
+                )
+            })?;
+        frei[pos] = false;
         let laenge = roh.len() as i64;
-        match doc.get_object_mut(*id) {
+        match doc.get_object_mut(ids[pos].0) {
             Ok(Object::Stream(s)) => {
                 s.set_plain_content(roh);
                 s.dict.set("Filter", Object::Name(b"DCTDecode".to_vec()));
                 s.dict.set("Length", Object::Integer(laenge));
                 s.dict.remove(b"DecodeParms");
             }
-            _ => return Err(anyhow!("Bildobjekt {:?} unerwartet verändert", id)),
+            _ => return Err(anyhow!("Bildobjekt {:?} unerwartet verändert", ids[pos].0)),
         }
     }
     doc.save(pdf)
