@@ -104,7 +104,14 @@ Unterschriften und Beilagen.
 ```sh
 cargo run --release --bin stellungnahme
 cargo run --release --bin stellungnahme -- --out /pfad/zum.pdf
+INHALT=zweite_inhalt.rs FOTO_DIR=/pfad/zu/belegen cargo run --release --bin stellungnahme
 ```
+
+Derselbe Satz kann mehrere Rechtsschriften erzeugen: `INHALT` wählt die
+Inhaltsdatei in `src/` (Vorgabe `stellungnahme_inhalt.rs`), `FOTO_DIR`
+das Verzeichnis der Belegbilder. Jede `src/*_inhalt.rs` ist vom
+Repository ausgeschlossen, weil sie Liegenschaft, Namen und Verfahren
+nennt.
 
 Die Anträge stehen vor der Begründung, weil die Behörde auf der ersten
 Seite sehen soll, was verlangt wird, und erst danach, warum. Die Nummern
@@ -122,6 +129,12 @@ allein ans Seitenende fiele, beginnt sein Titel im Inhalt mit `@`; das
 Zeichen erzwingt eine neue Seite und wird beim Satz entfernt. Das kostet
 Weissraum – aber eine Rechtsschrift, auf deren Ziffern später verwiesen
 wird, verträgt keinen Titel ohne Text darunter.
+
+Die Belegbilder bettet genpdf als entpackte Pixel ein; nach dem Satz
+werden die Bildströme gegen die Original-JPEGs getauscht, damit die
+Aufnahmen der Behörde bitgleich bleiben. Zugeordnet wird über Breite und
+Höhe, nicht über die Objektfolge im PDF – die folgt bei vielen Bildern
+nicht der Seitenfolge.
 
 ## Rust: Bewilligungslage mit Belegen
 

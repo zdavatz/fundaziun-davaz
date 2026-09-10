@@ -27,6 +27,7 @@ cargo run --release --bin stiftungen -- --k       # nur Kunst
 cargo run --release --bin stiftungen -- --g       # nur Gesundheit
 cargo run --release --bin bildinventar            # Fotodokumentation beschriften
 cargo run --release --bin stellungnahme           # Rechtsschrift
+INHALT=baustopp_inhalt.rs cargo run --release --bin stellungnahme   # zweite Rechtsschrift, gleicher Satz
 cargo run --release --bin bewilligung             # Bewilligungslage mit Belegen
 # alle vier: -- --out /pfad/zum.pdf
 ```
@@ -90,7 +91,10 @@ Fassung.
 Alle drei folgen demselben Muster wie `stiftungen.rs`: Satz eingecheckt,
 Inhalt daneben und ausgeschlossen (`src/inventar_inhalt.rs`,
 `src/stellungnahme_inhalt.rs`, `src/bewilligung_inhalt.rs`), neutrale
-Beispielfassung von `build.rs` ausgelegt. `bewilligung.rs` setzt zudem
+Beispielfassung von `build.rs` ausgelegt. `stellungnahme.rs` kann mehrere
+Rechtsschriften setzen: `INHALT=<datei>` wählt die Inhaltsdatei in `src/`
+(build.rs reicht den Namen per `cargo:rustc-env` an `include!` weiter),
+`$FOTO_DIR` die Belegbilder; jede `src/*_inhalt.rs` ist ausgeschlossen. `bewilligung.rs` setzt zudem
 Tabellen mit `TableLayout`; genpdf nimmt Schriftgrössen nur als ganze
 Zahlen (`u8`), halbe Punkte gibt es nicht.
 
@@ -101,7 +105,11 @@ Vier Dinge, die dabei zugeschlagen haben:
    dem Satz mit `lopdf` gegen die Original-JPEGs (baseline, drei Kanäle,
    `DCTDecode`) – rund 6 MB, und die Aufnahmen bleiben bitgleich die der
    Behörde, was bei einer Beilage im Bauverfahren der eigentliche Punkt
-   ist. Die Zuordnung läuft über die Objektreihenfolge und **bricht bei
+   ist. Die Zuordnung läuft in `stellungnahme.rs` über **Breite und Höhe**
+   aus dem SOF-Marker des JPEG: die Objektnummern folgen bei sechzehn
+   Bildern nicht der Seitenfolge, und vier Aufnahmen landeten verzerrt im
+   falschen Objekt. Zwei Belege mit gleichen Massen fallen innerhalb der
+   Gruppe auf die Reihenfolge zurück. Die Anzahlprüfung **bricht bei
    abweichender Anzahl ab**, wie `add_links`. Wird die Bildauswahl
    gefiltert, muss die Dateiliste derselben Auswahl folgen – sonst schlägt
    genau diese Sicherung an.
@@ -195,7 +203,8 @@ Hängt der OAuth-Flow scheinbar, liegt es an gepuffertem stdout – mit
   Hypothekenangaben
 - die erzeugten `*_Recherche.pdf` (jederzeit reproduzierbar)
 - `src/befunde.rs`, `src/inventar_inhalt.rs`,
-  `src/stellungnahme_inhalt.rs`, `src/bewilligung_inhalt.rs` –
+  `src/stellungnahme_inhalt.rs`, `src/bewilligung_inhalt.rs` und jede
+  weitere `src/*_inhalt.rs` –
   Bauartefakte, die `build.rs` anlegt; die echten Fassungen nennen
   Liegenschaft, Adresse, Verfahrensnummern, Namen und die Bauvorgänge am
   Gebäude
