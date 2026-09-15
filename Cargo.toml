@@ -20,7 +20,12 @@ path = "src/stellungnahme.rs"
 name = "bewilligung"
 path = "src/bewilligung.rs"
 
+[[bin]]
+name = "aktendossier"
+path = "src/aktendossier.rs"
+
 [dependencies]
 anyhow = "1"
 genpdf = { version = "0.2", features = ["images"] }
 lopdf = "0.34"
+image = "0.23"

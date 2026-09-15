@@ -136,6 +136,32 @@ Aufnahmen der Behörde bitgleich bleiben. Zugeordnet wird über Breite und
 Höhe, nicht über die Objektfolge im PDF – die folgt bei vielen Bildern
 nicht der Seitenfolge.
 
+## Rust: Aktendossier aus Fotos einer Akteneinsicht
+
+`src/aktendossier.rs` macht aus einem Ordner Handyfotos ein einziges PDF:
+je Aufnahme eine Seite, aufrecht gedreht, mit Seitenzahl und Dateiname in
+der Fusszeile, damit ein Aktenverzeichnis darauf verweisen kann.
+
+```sh
+cargo run --release --bin aktendossier -- \
+    --dir /pfad/zu/den/fotos --out Dossier.pdf \
+    --titel "Baudossier …, Akteneinsicht vom …" \
+    --orient lagen.txt --hoehe 1300
+```
+
+Das PDF wird direkt mit lopdf geschrieben, nicht mit genpdf: genpdf bettet
+Bilder als entpackte Pixel ein, und vierhundert Aufnahmen ergäben damit
+mehrere Gigabyte. Hier werden die Bilder verkleinert, als JPEG neu kodiert
+und mit DCTDecode eingebettet; 409 Seiten ergeben rund 70 MB.
+
+Gedreht wird zweimal: zuerst nach der EXIF-Ausrichtung des Handys, die das
+`image`-Paket nicht liest und deshalb aus dem APP1-Segment selbst gelesen
+wird, dann nach der Lage aus `--orient` – eine Textdatei mit je Zeile
+«dateiname up|right|left|down», wie sie eine Texterkennung liefert, die
+alle vier Lagen durchprobiert. Die Blätter eines Dossiers liegen oft quer
+oder kopfstehend auf dem Tisch; ohne diesen zweiten Schritt wären sie es
+auch im PDF.
+
 ## Rust: Bewilligungslage mit Belegen
 
 `src/bewilligung.rs` fasst zusammen, was in einem Bauverfahren bewilligt

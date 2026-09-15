@@ -8,10 +8,11 @@ Werkzeuge für die Errichtung der **FUNDAZIUN DA VAZ – VAL MÜSTAIR**
 (Art. 80 ff. ZGB, Sitz Sta. Maria, Val Müstair, Kanton Graubünden). Zwei
 Sprachen, zwei Aufgaben:
 
-- **Rust** – vier Satzprogramme: `src/stiftungen.rs` erzeugt den
+- **Rust** – fünf Programme: `src/stiftungen.rs` erzeugt den
   Recherchebericht, `src/bildinventar.rs` beschriftet eine behördliche
   Fotodokumentation, `src/stellungnahme.rs` setzt eine Rechtsschrift,
-  `src/bewilligung.rs` stellt die Bewilligungslage mit Aktenbelegen dar.
+  `src/bewilligung.rs` stellt die Bewilligungslage mit Aktenbelegen dar,
+  `src/aktendossier.rs` bindet die Fotos einer Akteneinsicht zu einem PDF.
 - **Python** – Google-Workspace-Skripte für Gmail, Drive und Docs sowie
   die versionierte Bearbeitung der Stiftungsurkunde.
 
@@ -29,7 +30,8 @@ cargo run --release --bin bildinventar            # Fotodokumentation beschrifte
 cargo run --release --bin stellungnahme           # Rechtsschrift
 INHALT=baustopp_inhalt.rs cargo run --release --bin stellungnahme   # zweite Rechtsschrift, gleicher Satz
 cargo run --release --bin bewilligung             # Bewilligungslage mit Belegen
-# alle vier: -- --out /pfad/zum.pdf
+cargo run --release --bin aktendossier -- --dir FOTOS --out D.pdf --titel T --orient lagen.txt
+# die vier Satzprogramme: -- --out /pfad/zum.pdf
 ```
 
 `$FONT_DIR` setzt das Schriftverzeichnis (Vorgabe `fonts`), `$FOTO_DIR` das
@@ -137,6 +139,23 @@ Vier Dinge, die dabei zugeschlagen haben:
 Nach jeder Änderung am Satz das fertige PDF prüfen: je Seite die Zahl der
 Bilder gegen die Zahl der Legenden, und ob ein Titel oder eine
 Antragsnummer als letzte Zeile einer Seite steht.
+
+### Aktendossier (`src/aktendossier.rs`)
+
+Kein genpdf, sondern lopdf direkt: je Foto ein Image-XObject mit
+`DCTDecode`, je Seite ein Inhaltsstrom mit `cm`/`Do` und einer Fusszeile in
+Helvetica (Standardschrift, WinAnsi, keine Einbettung). Zwei Dinge, die es
+zu wissen gilt:
+
+1. **`image` 0.23 liest keine EXIF-Ausrichtung.** Handys drehen die Pixel
+   nicht, sie setzen Tag 0x0112. `exif_ausrichtung` liest das Tag aus dem
+   APP1-Segment; ohne diesen Schritt stehen drei Viertel der Aufnahmen
+   quer, während die Texterkennung (Vision) sie aufrecht gesehen hat – und
+   die Lagen aus `--orient` passen dann nicht mehr.
+2. **Die Lagedatei stammt aus der Texterkennung**, die alle vier Drehungen
+   probiert und die mit dem meisten Text behält (`===== datei [lage] =====`
+   im OCR-Text). Sie ist nicht eingecheckt, weil sie die Dateinamen des
+   Dossiers nennt.
 
 ### Urkunden-Skripte (`make_v1*.py`) – lokal, nicht im Repository
 
