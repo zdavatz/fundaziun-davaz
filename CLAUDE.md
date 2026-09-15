@@ -152,10 +152,18 @@ zu wissen gilt:
    APP1-Segment; ohne diesen Schritt stehen drei Viertel der Aufnahmen
    quer, während die Texterkennung (Vision) sie aufrecht gesehen hat – und
    die Lagen aus `--orient` passen dann nicht mehr.
-2. **Die Lagedatei stammt aus der Texterkennung**, die alle vier Drehungen
-   probiert und die mit dem meisten Text behält (`===== datei [lage] =====`
-   im OCR-Text). Sie ist nicht eingecheckt, weil sie die Dateinamen des
-   Dossiers nennt.
+2. **Die Lagedatei muss aus der Zeilengeometrie kommen, nicht aus der
+   Zeichenzahl.** Vision erkennt Text auch kopfstehend und seitlich mit
+   praktisch gleicher Zeichenzahl; «vier Drehungen probieren, die mit dem
+   meisten Text behalten» hat jede vierte Seite falsch gelegt. Verlässlich
+   ist der Winkel des Vektors topLeft→topRight der erkannten Zeilen
+   (0° aufrecht, 90° → `right`, 180° → `down`, 270° → `left`), gewichtet
+   nach Zeichenzahl. Seiten fast ohne Text (Pläne, Fotos) bleiben `up`
+   und sind von Hand zu prüfen. Die Lagedatei ist nicht eingecheckt, weil
+   sie die Dateinamen des Dossiers nennt.
+3. **`--reihenfolge`** ordnet die Seiten nach einer Liste
+   «dateiname<TAB>beschriftung» (z. B. chronologisch aus dem
+   Aktenverzeichnis); Unaufgeführtes folgt am Schluss.
 
 ### Urkunden-Skripte (`make_v1*.py`) – lokal, nicht im Repository
 

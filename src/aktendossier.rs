@@ -9,7 +9,7 @@
 //   cargo run --release --bin aktendossier -- \
 //       --dir /pfad/zu/den/fotos --out Dossier.pdf \
 //       --titel "Baudossier …, Akteneinsicht 10.9.2026" \
-//       [--orient orientierungen.txt] [--hoehe 1600]
+//       [--orient orientierungen.txt] [--reihenfolge reihenfolge.txt] [--hoehe 1600]
 //
 // Die Bilder werden verkleinert (Vorgabe: 1600 Pixel Höhe), als JPEG neu
 // kodiert und mit DCTDecode ins PDF gelegt. Das PDF wird direkt mit lopdf
@@ -22,6 +22,12 @@
 // left|down», wie sie die Texterkennung liefert, die alle vier Lagen
 // durchprobiert und die mit dem meisten Text behält. Fehlt die Datei oder
 // der Eintrag, bleibt das Bild, wie es ist.
+//
+// Reihenfolge: Ohne --reihenfolge kommen die Dateien alphabetisch, also in
+// Aufnahmefolge. Mit --reihenfolge bestimmt eine Textdatei die Seitenfolge –
+// je Zeile «dateiname<TAB>beschriftung», etwa chronologisch nach dem
+// Aktenverzeichnis; die Beschriftung erscheint in der Fusszeile. Dateien, die
+// in der Liste fehlen, folgen am Schluss in Aufnahmefolge.
 //
 // Die Fusszeile nutzt die PDF-Standardschrift Helvetica in WinAnsi-Kodierung;
 // sie braucht keine eingebettete Schrift, und Umlaute sind darin enthalten.
@@ -48,6 +54,7 @@ struct Optionen {
     out: PathBuf,
     titel: String,
     orient: Option<PathBuf>,
+    reihenfolge: Option<PathBuf>,
     hoehe: u32,
 }
 
@@ -57,6 +64,7 @@ fn optionen() -> Result<Optionen> {
         out: PathBuf::from("Aktendossier.pdf"),
         titel: String::from("Aktendossier"),
         orient: None,
+        reihenfolge: None,
         hoehe: 1600,
     };
     let mut args = env::args().skip(1);
@@ -67,6 +75,7 @@ fn optionen() -> Result<Optionen> {
             "--out" => o.out = PathBuf::from(wert()?),
             "--titel" => o.titel = wert()?,
             "--orient" => o.orient = Some(PathBuf::from(wert()?)),
+            "--reihenfolge" => o.reihenfolge = Some(PathBuf::from(wert()?)),
             "--hoehe" => o.hoehe = wert()?.parse().context("--hoehe: ganze Zahl")?,
             other => return Err(anyhow!("unbekanntes Argument: {other}")),
         }
@@ -96,6 +105,24 @@ fn orientierungen(pfad: &Path) -> Result<HashMap<String, &'static str>> {
         }
     }
     Ok(map)
+}
+
+/// Liest «dateiname<TAB>beschriftung» je Zeile; ohne Tabulator bleibt die
+/// Beschriftung leer.
+fn reihenfolge(pfad: &Path) -> Result<Vec<(String, String)>> {
+    let text = fs::read_to_string(pfad)
+        .with_context(|| format!("Reihenfolge lesen: {}", pfad.display()))?;
+    Ok(text
+        .lines()
+        .filter(|z| !z.trim().is_empty())
+        .map(|z| {
+            let mut t = z.splitn(2, '\t');
+            (
+                t.next().unwrap_or("").trim().to_string(),
+                t.next().unwrap_or("").trim().to_string(),
+            )
+        })
+        .collect())
 }
 
 /// EXIF-Ausrichtung (Tag 0x0112) aus dem APP1-Segment eines JPEG; 1, wenn
@@ -222,7 +249,26 @@ fn main() -> Result<()> {
     if dateien.is_empty() {
         return Err(anyhow!("keine JPEG-Dateien in {}", o.dir.display()));
     }
-    let anzahl = dateien.len();
+    // Seitenfolge und Beschriftung: aus der Liste, Rest hinten anfügen.
+    let mut seiten: Vec<(PathBuf, String)> = Vec::with_capacity(dateien.len());
+    if let Some(p) = &o.reihenfolge {
+        let mut uebrig: Vec<PathBuf> = dateien.clone();
+        for (name, text) in reihenfolge(p)? {
+            if let Some(i) = uebrig.iter().position(|d| {
+                d.file_name().and_then(|n| n.to_str()) == Some(name.as_str())
+            }) {
+                seiten.push((uebrig.remove(i), text));
+            } else {
+                eprintln!("Reihenfolge: {} nicht im Verzeichnis, übersprungen", name);
+            }
+        }
+        for d in uebrig {
+            seiten.push((d, String::new()));
+        }
+    } else {
+        seiten = dateien.into_iter().map(|d| (d, String::new())).collect();
+    }
+    let anzahl = seiten.len();
 
     let mut doc = Document::with_version("1.5");
     let pages_id = doc.new_object_id();
@@ -234,7 +280,7 @@ fn main() -> Result<()> {
     });
     let mut kids = Vec::with_capacity(anzahl);
 
-    for (i, pfad) in dateien.iter().enumerate() {
+    for (i, (pfad, text)) in seiten.iter().enumerate() {
         let name = pfad
             .file_name()
             .and_then(|n| n.to_str())
@@ -264,7 +310,11 @@ fn main() -> Result<()> {
         let x = (sb - zb) / 2.0;
         let y = sh - RAND - zh;
 
-        let fuss = format!("{} – Seite {} von {} – {}", o.titel, i + 1, anzahl, name);
+        let fuss = if text.is_empty() {
+            format!("{} – Seite {} von {} – {}", o.titel, i + 1, anzahl, name)
+        } else {
+            format!("{} – Seite {} von {} – {} – {}", o.titel, i + 1, anzahl, text, name)
+        };
         let content = Content {
             operations: vec![
                 Operation::new("q", vec![]),

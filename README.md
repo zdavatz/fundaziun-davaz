@@ -146,8 +146,13 @@ der Fusszeile, damit ein Aktenverzeichnis darauf verweisen kann.
 cargo run --release --bin aktendossier -- \
     --dir /pfad/zu/den/fotos --out Dossier.pdf \
     --titel "Baudossier …, Akteneinsicht vom …" \
-    --orient lagen.txt --hoehe 1300
+    --orient lagen.txt --reihenfolge reihenfolge.txt --hoehe 1300
 ```
+
+`--reihenfolge` legt die Seitenfolge fest, je Zeile «dateiname<TAB>
+beschriftung», etwa chronologisch nach einem Aktenverzeichnis; die
+Beschriftung erscheint in der Fusszeile. Was in der Liste fehlt, folgt am
+Schluss in Aufnahmefolge.
 
 Das PDF wird direkt mit lopdf geschrieben, nicht mit genpdf: genpdf bettet
 Bilder als entpackte Pixel ein, und vierhundert Aufnahmen ergäben damit
@@ -158,9 +163,13 @@ Gedreht wird zweimal: zuerst nach der EXIF-Ausrichtung des Handys, die das
 `image`-Paket nicht liest und deshalb aus dem APP1-Segment selbst gelesen
 wird, dann nach der Lage aus `--orient` – eine Textdatei mit je Zeile
 «dateiname up|right|left|down», wie sie eine Texterkennung liefert, die
-alle vier Lagen durchprobiert. Die Blätter eines Dossiers liegen oft quer
-oder kopfstehend auf dem Tisch; ohne diesen zweiten Schritt wären sie es
-auch im PDF.
+die Leserichtung aus der Geometrie der Textzeilen bestimmt. Die Blätter
+eines Dossiers liegen oft quer oder kopfstehend auf dem Tisch; ohne diesen
+zweiten Schritt wären sie es auch im PDF. Vorsicht bei der Lagebestimmung:
+Apples Vision liest Text auch kopfstehend und seitlich und liefert dann
+dieselbe Zeichenzahl – die Zeichenzahl je Drehung taugt nicht als Mass.
+Verlässlich ist der Vektor von der linken zur rechten oberen Ecke jeder
+erkannten Zeile; sein Winkel sagt, wie das Blatt liegt.
 
 ## Rust: Bewilligungslage mit Belegen
 
