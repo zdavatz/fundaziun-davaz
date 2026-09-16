@@ -171,6 +171,23 @@ dieselbe Zeichenzahl – die Zeichenzahl je Drehung taugt nicht als Mass.
 Verlässlich ist der Vektor von der linken zur rechten oberen Ecke jeder
 erkannten Zeile; sein Winkel sagt, wie das Blatt liegt.
 
+## Rust: Seitenlage der Fotos bestimmen
+
+`src/seitenlage.rs` sagt je Foto, wie das Blatt liegt, und schreibt die
+Lagedatei für `aktendossier --orient`:
+
+```sh
+cargo run --release --bin seitenlage -- fotos/*.jpg > lagen.txt
+# je Zeile: dateiname up|right|down|left zeichen [stimmen]
+```
+
+Nur macOS: die Erkennung läuft über Apples Vision-Framework, angebunden mit
+den objc2-Bindings. Vision liefert zu jeder erkannten Textzeile die Ecken
+in Bildkoordinaten; der Winkel von der linken zur rechten oberen Ecke ist
+die Leserichtung, und die Zeichen der Zeile gewichten die Stimme. Seiten
+ohne Text bleiben `up` mit Zeichenzahl 0 und sind von Hand zu prüfen. Die
+Zeichenzahl je Drehung zu vergleichen taugt nicht, siehe oben.
+
 ## Rust: Bewilligungslage mit Belegen
 
 `src/bewilligung.rs` fasst zusammen, was in einem Bauverfahren bewilligt

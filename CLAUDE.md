@@ -8,11 +8,12 @@ Werkzeuge für die Errichtung der **FUNDAZIUN DA VAZ – VAL MÜSTAIR**
 (Art. 80 ff. ZGB, Sitz Sta. Maria, Val Müstair, Kanton Graubünden). Zwei
 Sprachen, zwei Aufgaben:
 
-- **Rust** – fünf Programme: `src/stiftungen.rs` erzeugt den
+- **Rust** – sechs Programme: `src/stiftungen.rs` erzeugt den
   Recherchebericht, `src/bildinventar.rs` beschriftet eine behördliche
   Fotodokumentation, `src/stellungnahme.rs` setzt eine Rechtsschrift,
   `src/bewilligung.rs` stellt die Bewilligungslage mit Aktenbelegen dar,
-  `src/aktendossier.rs` bindet die Fotos einer Akteneinsicht zu einem PDF.
+  `src/aktendossier.rs` bindet die Fotos einer Akteneinsicht zu einem PDF,
+  `src/seitenlage.rs` bestimmt dafür je Foto die Drehung (Vision, nur macOS).
 - **Python** – Google-Workspace-Skripte für Gmail, Drive und Docs sowie
   die versionierte Bearbeitung der Stiftungsurkunde.
 
@@ -30,7 +31,8 @@ cargo run --release --bin bildinventar            # Fotodokumentation beschrifte
 cargo run --release --bin stellungnahme           # Rechtsschrift
 INHALT=baustopp_inhalt.rs cargo run --release --bin stellungnahme   # zweite Rechtsschrift, gleicher Satz
 cargo run --release --bin bewilligung             # Bewilligungslage mit Belegen
-cargo run --release --bin aktendossier -- --dir FOTOS --out D.pdf --titel T --orient lagen.txt
+cargo run --release --bin seitenlage -- FOTOS/*.jpg > lagen.txt   # Lage je Foto (macOS)
+cargo run --release --bin aktendossier -- --dir FOTOS --out D.pdf --titel T --orient lagen.txt --reihenfolge r.txt
 # die vier Satzprogramme: -- --out /pfad/zum.pdf
 ```
 
@@ -152,15 +154,21 @@ zu wissen gilt:
    APP1-Segment; ohne diesen Schritt stehen drei Viertel der Aufnahmen
    quer, während die Texterkennung (Vision) sie aufrecht gesehen hat – und
    die Lagen aus `--orient` passen dann nicht mehr.
-2. **Die Lagedatei muss aus der Zeilengeometrie kommen, nicht aus der
-   Zeichenzahl.** Vision erkennt Text auch kopfstehend und seitlich mit
+2. **Die Lagedatei kommt von `seitenlage` und muss aus der
+   Zeilengeometrie stammen, nicht aus der Zeichenzahl.** Vision erkennt Text auch kopfstehend und seitlich mit
    praktisch gleicher Zeichenzahl; «vier Drehungen probieren, die mit dem
    meisten Text behalten» hat jede vierte Seite falsch gelegt. Verlässlich
    ist der Winkel des Vektors topLeft→topRight der erkannten Zeilen
    (0° aufrecht, 90° → `right`, 180° → `down`, 270° → `left`), gewichtet
-   nach Zeichenzahl. Seiten fast ohne Text (Pläne, Fotos) bleiben `up`
-   und sind von Hand zu prüfen. Die Lagedatei ist nicht eingecheckt, weil
-   sie die Dateinamen des Dossiers nennt.
+   nach Zeichenzahl; bei Gleichstand gewinnt `up` (Rusts `max_by_key`
+   nähme das letzte Maximum, also `left`). Seiten fast ohne Text (Pläne,
+   Fotos) bleiben `up` und sind von Hand zu prüfen. Die Lagedatei ist
+   nicht eingecheckt, weil sie die Dateinamen des Dossiers nennt.
+   `seitenlage` nutzt Vision über objc2 (`objc2-vision`, `objc2-image-io`);
+   die EXIF-Ausrichtung wird Vision beim Handler mitgegeben, damit die
+   Lage relativ zum angezeigten Bild gilt. Die Enum
+   `CGImagePropertyOrientation` liegt in `objc2-image-io`, nicht in
+   `objc2-core-graphics`.
 3. **`--reihenfolge`** ordnet die Seiten nach einer Liste
    «dateiname<TAB>beschriftung» (z. B. chronologisch aus dem
    Aktenverzeichnis); Unaufgeführtes folgt am Schluss.
