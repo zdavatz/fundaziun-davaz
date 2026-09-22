@@ -55,6 +55,17 @@ fn main() {
     println!("cargo:rustc-env=STELLUNGNAHME_INHALT={inhalt}");
     println!("cargo:rerun-if-env-changed=INHALT");
     println!("cargo:rerun-if-changed=src/{inhalt}");
+    let ziel = Path::new("src/konzept_inhalt.rs");
+    if !ziel.exists() {
+        std::fs::copy("src/konzept_inhalt.beispiel.rs", ziel)
+            .expect("neutrale Fassung des Konzepts konnte nicht ausgelegt werden");
+        println!(
+            "cargo:warning=src/konzept_inhalt.rs fehlte - neutrale Fassung aus \
+             src/konzept_inhalt.beispiel.rs ausgelegt."
+        );
+    }
+    println!("cargo:rerun-if-changed=src/konzept_inhalt.rs");
+    println!("cargo:rerun-if-changed=src/konzept_inhalt.beispiel.rs");
     println!("cargo:rerun-if-changed=src/inventar_inhalt.rs");
     println!("cargo:rerun-if-changed=src/stellungnahme_inhalt.rs");
     println!("cargo:rerun-if-changed=src/stellungnahme_inhalt.beispiel.rs");

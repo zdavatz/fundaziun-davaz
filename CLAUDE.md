@@ -8,12 +8,13 @@ Werkzeuge für die Errichtung der **FUNDAZIUN DA VAZ – VAL MÜSTAIR**
 (Art. 80 ff. ZGB, Sitz Sta. Maria, Val Müstair, Kanton Graubünden). Zwei
 Sprachen, zwei Aufgaben:
 
-- **Rust** – sechs Programme: `src/stiftungen.rs` erzeugt den
+- **Rust** – sieben Programme: `src/stiftungen.rs` erzeugt den
   Recherchebericht, `src/bildinventar.rs` beschriftet eine behördliche
   Fotodokumentation, `src/stellungnahme.rs` setzt eine Rechtsschrift,
   `src/bewilligung.rs` stellt die Bewilligungslage mit Aktenbelegen dar,
   `src/aktendossier.rs` bindet die Fotos einer Akteneinsicht zu einem PDF,
-  `src/seitenlage.rs` bestimmt dafür je Foto die Drehung (Vision, nur macOS).
+  `src/seitenlage.rs` bestimmt dafür je Foto die Drehung (Vision, nur macOS),
+  `src/konzept.rs` setzt ein Arbeitspapier aus Blöcken (Titel, Listen, Tabellen).
 - **Python** – Google-Workspace-Skripte für Gmail, Drive und Docs sowie
   die versionierte Bearbeitung der Stiftungsurkunde.
 
@@ -31,6 +32,7 @@ cargo run --release --bin bildinventar            # Fotodokumentation beschrifte
 cargo run --release --bin stellungnahme           # Rechtsschrift
 INHALT=baustopp_inhalt.rs cargo run --release --bin stellungnahme   # zweite Rechtsschrift, gleicher Satz
 cargo run --release --bin bewilligung             # Bewilligungslage mit Belegen
+cargo run --release --bin konzept                 # Konzeptpapier aus Blöcken
 cargo run --release --bin seitenlage -- FOTOS/*.jpg > lagen.txt   # Lage je Foto (macOS)
 cargo run --release --bin aktendossier -- --dir FOTOS --out D.pdf --titel T --orient lagen.txt --reihenfolge r.txt
 # die vier Satzprogramme: -- --out /pfad/zum.pdf
@@ -238,8 +240,8 @@ Hängt der OAuth-Flow scheinbar, liegt es an gepuffertem stdout – mit
   Hypothekenangaben
 - die erzeugten `*_Recherche.pdf` (jederzeit reproduzierbar)
 - `src/befunde.rs`, `src/inventar_inhalt.rs`,
-  `src/stellungnahme_inhalt.rs`, `src/bewilligung_inhalt.rs` und jede
-  weitere `src/*_inhalt.rs` –
+  `src/stellungnahme_inhalt.rs`, `src/bewilligung_inhalt.rs`,
+  `src/konzept_inhalt.rs` und jede weitere `src/*_inhalt.rs` –
   Bauartefakte, die `build.rs` anlegt; die echten Fassungen nennen
   Liegenschaft, Adresse, Verfahrensnummern, Namen und die Bauvorgänge am
   Gebäude

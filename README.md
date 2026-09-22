@@ -171,6 +171,24 @@ dieselbe Zeichenzahl – die Zeichenzahl je Drehung taugt nicht als Mass.
 Verlässlich ist der Vektor von der linken zur rechten oberen Ecke jeder
 erkannten Zeile; sein Winkel sagt, wie das Blatt liegt.
 
+## Rust: Konzeptpapier als PDF
+
+`src/konzept.rs` setzt ein Arbeitspapier aus einer Blockfolge: Hauptziffern,
+Zwischentitel, Absätze, Aufzählungen, Tabellen, hervorgehobene Kästen und
+Seitenumbrüche. `**fett**` im Text setzt einen Lauf fett. Der Inhalt steht in
+`src/konzept_inhalt.rs` (ausgeschlossen; `build.rs` legt die neutrale
+Beispielfassung aus).
+
+```sh
+cargo run --release --bin konzept -- --out /pfad/zum.pdf
+```
+
+Aufzählungen sind zweispaltige Tabellen ohne Rahmen, Punkt links, Text
+rechts: genpdf kennt keine Listen, und so bleibt der Einzug beim Umbruch
+erhalten. Kästen sind einzellige Tabellen mit Rahmen. Wo eine Tabelle oder
+ein Kasten nicht über die Seite brechen soll, steht ein `Block::Umbruch`
+davor – genpdf kann nicht zusammenhalten.
+
 ## Rust: Seitenlage der Fotos bestimmen
 
 `src/seitenlage.rs` sagt je Foto, wie das Blatt liegt, und schreibt die

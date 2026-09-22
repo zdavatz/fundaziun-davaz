@@ -28,6 +28,10 @@ path = "src/aktendossier.rs"
 name = "seitenlage"
 path = "src/seitenlage.rs"
 
+[[bin]]
+name = "konzept"
+path = "src/konzept.rs"
+
 [dependencies]
 anyhow = "1"
 genpdf = { version = "0.2", features = ["images"] }
